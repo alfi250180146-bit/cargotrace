@@ -30,5 +30,10 @@ class DatabaseSeeder extends Seeder
             $user->email_verified_at = now();
             $user->save();
         }
+
+        $this->call([
+            CarrierSeeder::class,
+            LocationSeeder::class,
+        ]);
     }
 }
