@@ -17,9 +17,10 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $demo = [
-            ['Admin Demo',    'admin@cargotrace.test',    User::ROLE_ADMIN],
-            ['Operator Demo', 'operator@cargotrace.test', User::ROLE_OPERATOR],
-            ['Customer Demo', 'customer@cargotrace.test', User::ROLE_CUSTOMER],
+            ['Admin Demo',     'admin@cargotrace.test',     User::ROLE_ADMIN],
+            ['Operator Demo',  'operator@cargotrace.test',  User::ROLE_OPERATOR],
+            ['Customer Demo',  'customer@cargotrace.test',  User::ROLE_CUSTOMER],
+            ['Customer Two',   'customer2@cargotrace.test', User::ROLE_CUSTOMER],
         ];
 
         foreach ($demo as [$name, $email, $role]) {
@@ -34,6 +35,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             CarrierSeeder::class,
             LocationSeeder::class,
+            ShipmentSeeder::class,
         ]);
     }
 }
