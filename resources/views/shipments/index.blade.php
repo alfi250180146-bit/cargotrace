@@ -1,12 +1,26 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Shipments') }}
-        </h2>
+        <div class="flex items-center justify-between">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                {{ __('Shipments') }}
+            </h2>
+            @can('create', App\Models\Shipment::class)
+                <a href="{{ route('shipments.create') }}"
+                   class="inline-block px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700">
+                    New shipment
+                </a>
+            @endcan
+        </div>
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-4">
+            @if (session('status'))
+                <div class="p-4 rounded-md bg-green-100 text-green-800 text-sm">
+                    {{ session('status') }}
+                </div>
+            @endif
+
             <div class="bg-white shadow-sm sm:rounded-lg p-6 overflow-x-auto">
                 <table class="min-w-full text-sm text-left">
                     <thead class="text-gray-600 border-b">

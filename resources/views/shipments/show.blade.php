@@ -7,6 +7,12 @@
 
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-6">
+            @if (session('status'))
+                <div class="p-4 rounded-md bg-green-100 text-green-800 text-sm">
+                    {{ session('status') }}
+                </div>
+            @endif
+
             <div class="bg-white shadow-sm sm:rounded-lg p-6">
                 <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     <div><dt class="text-gray-500">Status</dt><dd class="font-semibold">{{ $shipment->current_status }}</dd></div>
@@ -21,6 +27,27 @@
                     <div><dt class="text-gray-500">Expected arrival</dt><dd>{{ $shipment->expected_arrival->format('d M Y H:i') }}</dd></div>
                     <div><dt class="text-gray-500">Estimated arrival (ETA)</dt><dd>{{ $shipment->estimated_arrival ? $shipment->estimated_arrival->format('d M Y H:i') : '-' }}</dd></div>
                 </dl>
+
+                <div class="mt-6 flex items-center gap-3">
+                    @can('update', $shipment)
+                        <a href="{{ route('shipments.edit', $shipment) }}"
+                           class="inline-block px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700">
+                            Edit
+                        </a>
+                    @endcan
+
+                    @can('delete', $shipment)
+                        <form method="POST" action="{{ route('shipments.destroy', $shipment) }}"
+                              onsubmit="return confirm('Delete shipment {{ $shipment->shipment_number }}?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit"
+                                    class="px-4 py-2 bg-red-600 text-white text-sm rounded-md hover:bg-red-700">
+                                Delete
+                            </button>
+                        </form>
+                    @endcan
+                </div>
             </div>
 
             <div class="bg-white shadow-sm sm:rounded-lg p-6">
