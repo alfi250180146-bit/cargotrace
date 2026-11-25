@@ -70,4 +70,24 @@ class Shipment extends Model
     {
         return $this->hasMany(ShipmentItem::class);
     }
+
+    /**
+     * Riwayat perjalanan, selalu urut kronologis (lama ke baru).
+     */
+    public function trackingEvents(): HasMany
+    {
+        return $this->hasMany(TrackingEvent::class)
+            ->orderBy('occurred_at')
+            ->orderBy('id');
+    }
+
+    /**
+     * Exception terbaru di atas.
+     */
+    public function exceptions(): HasMany
+    {
+        return $this->hasMany(ShipmentException::class)
+            ->orderByDesc('detected_at')
+            ->orderByDesc('id');
+    }
 }

@@ -6,15 +6,22 @@ use App\Http\Requests\ShipmentRequest;
 use App\Models\Carrier;
 use App\Models\Location;
 use App\Models\Shipment;
+use App\Models\ShipmentException;
 use App\Models\User;
+use App\Services\EtaService;
+use App\Services\ExceptionService;
 use App\Services\ShipmentService;
+use App\Services\TrackingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class ShipmentController extends Controller
 {
-    public function __construct(private ShipmentService $shipments)
-    {
+    public function __construct(
+        private ShipmentService $shipments,
+        private TrackingService $tracking,
+        private EtaService $eta,
+    ) {
     }
 
     public function index(Request $request)
@@ -56,9 +63,22 @@ class ShipmentController extends Controller
     {
         Gate::authorize('view', $shipment);
 
-        $shipment->load(['customer', 'carrier', 'origin', 'destination', 'items']);
+        $shipment->load([
+            'customer', 'carrier', 'origin', 'destination', 'items',
+            'trackingEvents.location', 'trackingEvents.creator',
+            'exceptions',
+        ]);
 
-        return view('shipments.show', compact('shipment'));
+        return view('shipments.show', [
+            'shipment' => $shipment,
+            'locations' => Location::orderBy('name')->get(),
+            'allStatuses' => array_keys(TrackingService::TRANSITIONS),
+            'nextStatuses' => $this->tracking->nextStatuses($shipment->current_status),
+            'eta' => $this->eta->analyze($shipment),
+            'exceptionTypes' => ShipmentException::TYPES,
+            'severities' => ShipmentException::SEVERITIES,
+            'exceptionTransitions' => ExceptionService::TRANSITIONS,
+        ]);
     }
 
     public function edit(Shipment $shipment)

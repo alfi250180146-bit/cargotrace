@@ -43,4 +43,14 @@ class ShipmentPolicy
     {
         return $user->hasRole(User::ROLE_ADMIN);
     }
+
+    public function addTracking(User $user, Shipment $shipment): bool
+    {
+        return $user->hasRole(User::ROLE_ADMIN, User::ROLE_OPERATOR);
+    }
+
+    public function manageExceptions(User $user, Shipment $shipment): bool
+    {
+        return $user->hasRole(User::ROLE_ADMIN, User::ROLE_OPERATOR);
+    }
 }

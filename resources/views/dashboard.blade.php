@@ -10,9 +10,18 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 space-y-3">
                     <p>Welcome, {{ auth()->user()->name }} ({{ auth()->user()->role }}).</p>
-                    <a href="{{ route('shipments.index') }}" class="inline-block text-indigo-600 hover:underline">
-                        Go to shipments &rarr;
-                    </a>
+
+                    <div class="flex flex-wrap gap-4">
+                        <a href="{{ route('shipments.index') }}" class="text-indigo-600 hover:underline">
+                            Go to shipments &rarr;
+                        </a>
+
+                        @if (auth()->user()->hasRole('admin'))
+                            <a href="{{ route('settings.edit') }}" class="text-indigo-600 hover:underline">
+                                Delay settings &rarr;
+                            </a>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>

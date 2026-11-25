@@ -33,9 +33,12 @@ class DatabaseSeeder extends Seeder
         }
 
         $this->call([
+            SettingSeeder::class,
             CarrierSeeder::class,
             LocationSeeder::class,
             ShipmentSeeder::class,
+            TrackingEventSeeder::class,
+            ExceptionSeeder::class,
         ]);
     }
 }
