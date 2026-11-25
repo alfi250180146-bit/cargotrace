@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\CarrierController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ShipmentController;
@@ -11,9 +14,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth'])->name('dashboard');
+Route::get('/dashboard', DashboardController::class)
+    ->middleware(['auth'])
+    ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -30,8 +33,11 @@ Route::middleware('auth')->group(function () {
     Route::patch('/exceptions/{shipmentException}', [ShipmentExceptionController::class, 'update'])
         ->name('exceptions.update');
 
-    // Pengaturan threshold delay: hanya Admin
+    // Khusus Admin: master data dan pengaturan threshold
     Route::middleware('role:admin')->group(function () {
+        Route::resource('carriers', CarrierController::class)->except('show');
+        Route::resource('locations', LocationController::class)->except('show');
+
         Route::get('/settings', [SettingController::class, 'edit'])->name('settings.edit');
         Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
     });

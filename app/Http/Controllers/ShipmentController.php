@@ -14,6 +14,7 @@ use App\Services\ShipmentService;
 use App\Services\TrackingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 
 class ShipmentController extends Controller
 {
@@ -30,15 +31,53 @@ class ShipmentController extends Controller
 
         $user = $request->user();
 
+        $filters = $request->validate([
+            'q' => ['nullable', 'string', 'max:50'],
+            'status' => ['nullable', Rule::in(array_keys(TrackingService::TRANSITIONS))],
+            'carrier_id' => ['nullable', 'integer'],
+            'origin_id' => ['nullable', 'integer'],
+            'destination_id' => ['nullable', 'integer'],
+            'date_from' => ['nullable', 'date'],
+            'date_to' => ['nullable', 'date', 'after_or_equal:date_from'],
+            'delay' => ['nullable', Rule::in(['delayed', 'on_time'])],
+            'sort' => ['nullable', Rule::in(['id', 'shipment_number', 'expected_arrival', 'current_status'])],
+            'dir' => ['nullable', Rule::in(['asc', 'desc'])],
+        ]);
+
+        $sort = $filters['sort'] ?? 'id';
+        $dir = $filters['dir'] ?? 'desc';
+
         $shipments = Shipment::with(['customer', 'carrier', 'origin', 'destination'])
+            // Customer hanya boleh melihat shipment miliknya sendiri
             ->when(
                 ! $user->hasRole(User::ROLE_ADMIN, User::ROLE_OPERATOR),
                 fn ($query) => $query->where('customer_id', $user->id)
             )
-            ->latest('id')
-            ->paginate(10);
+            ->when($filters['q'] ?? null, fn ($query, $value) => $query->where('shipment_number', 'like', '%'.$value.'%'))
+            ->when($filters['status'] ?? null, fn ($query, $value) => $query->where('current_status', $value))
+            ->when($filters['carrier_id'] ?? null, fn ($query, $value) => $query->where('carrier_id', $value))
+            ->when($filters['origin_id'] ?? null, fn ($query, $value) => $query->where('origin_id', $value))
+            ->when($filters['destination_id'] ?? null, fn ($query, $value) => $query->where('destination_id', $value))
+            ->when($filters['date_from'] ?? null, fn ($query, $value) => $query->whereDate('expected_arrival', '>=', $value))
+            ->when($filters['date_to'] ?? null, fn ($query, $value) => $query->whereDate('expected_arrival', '<=', $value))
+            ->when(($filters['delay'] ?? null) === 'delayed', fn ($query) => $query->whereColumn('estimated_arrival', '>', 'expected_arrival'))
+            ->when(($filters['delay'] ?? null) === 'on_time', fn ($query) => $query->where(function ($inner) {
+                $inner->whereNull('estimated_arrival')->orWhereColumn('estimated_arrival', '<=', 'expected_arrival');
+            }))
+            ->orderBy($sort, $dir)
+            ->when($sort !== 'id', fn ($query) => $query->orderByDesc('id'))
+            ->paginate(10)
+            ->withQueryString();
 
-        return view('shipments.index', compact('shipments'));
+        return view('shipments.index', [
+            'shipments' => $shipments,
+            'filters' => $filters,
+            'sort' => $sort,
+            'dir' => $dir,
+            'carriers' => Carrier::orderBy('name')->get(),
+            'locations' => Location::orderBy('name')->get(),
+            'statuses' => array_keys(TrackingService::TRANSITIONS),
+        ]);
     }
 
     public function create()
