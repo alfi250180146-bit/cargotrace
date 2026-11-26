@@ -1,76 +1,53 @@
 @php
     $show = fn ($value, $suffix = '') => $value === null ? '-' : $value.$suffix;
-
-    $cards = [
-        ['Total shipments', $stats['total'], ''],
-        ['In transit', $stats['in_transit'], ''],
-        ['Delivered', $stats['delivered'], ''],
-        ['Delayed now', $stats['delayed_now'], ''],
-        ['Open exceptions', $stats['open_exceptions'], ''],
-    ];
-
-    $kpis = [
-        ['Delay rate', $stats['delay_rate'], '%'],
-        ['Exception rate', $stats['exception_rate'], '%'],
-        ['On-time delivery rate', $stats['on_time_rate'], '%'],
-        ['Average delay', $stats['avg_delay'], ' h'],
-        ['Avg exception resolution', $stats['avg_resolution'], ' h'],
-    ];
 @endphp
 
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
-    </x-slot>
-
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="flex flex-wrap items-center justify-between gap-3">
-                <p class="text-sm text-gray-600">
-                    Welcome, {{ auth()->user()->name }} ({{ auth()->user()->role }}).
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <h2 class="font-semibold text-xl text-gray-800 leading-tight">Dashboard</h2>
+                <p class="text-sm text-gray-500 mt-1">
+                    Welcome back, {{ auth()->user()->name }}.
                     @if (auth()->user()->hasRole('customer'))
                         Showing your own shipments only.
                     @endif
                 </p>
+            </div>
 
-                <div class="flex flex-wrap gap-4 text-sm">
-                    <a href="{{ route('shipments.index') }}" class="text-indigo-600 hover:underline">Shipments</a>
-                    @if (auth()->user()->hasRole('admin'))
-                        <a href="{{ route('carriers.index') }}" class="text-indigo-600 hover:underline">Carriers</a>
-                        <a href="{{ route('locations.index') }}" class="text-indigo-600 hover:underline">Locations</a>
-                        <a href="{{ route('settings.edit') }}" class="text-indigo-600 hover:underline">Delay settings</a>
-                    @endif
-                </div>
+            <a href="{{ route('shipments.index') }}"
+               class="inline-block px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700">
+                View shipments
+            </a>
+        </div>
+    </x-slot>
+
+    <div class="py-8">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+            <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+                <x-stat-card label="Total shipments" :value="$stats['total']" accent="indigo" />
+                <x-stat-card label="In transit" :value="$stats['in_transit']" accent="sky" />
+                <x-stat-card label="Delivered" :value="$stats['delivered']" accent="green" />
+                <x-stat-card label="Delayed now" :value="$stats['delayed_now']" accent="amber" />
+                <x-stat-card label="Open exceptions" :value="$stats['open_exceptions']" accent="red" />
             </div>
 
             <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
-                @foreach ($cards as [$label, $value, $suffix])
-                    <div class="bg-white shadow-sm sm:rounded-lg p-4">
-                        <div class="text-xs text-gray-500">{{ $label }}</div>
-                        <div class="text-2xl font-semibold mt-1">{{ $show($value, $suffix) }}</div>
-                    </div>
-                @endforeach
-            </div>
-
-            <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
-                @foreach ($kpis as [$label, $value, $suffix])
-                    <div class="bg-white shadow-sm sm:rounded-lg p-4 border-l-4 border-indigo-500">
-                        <div class="text-xs text-gray-500">{{ $label }}</div>
-                        <div class="text-2xl font-semibold mt-1">{{ $show($value, $suffix) }}</div>
-                    </div>
-                @endforeach
+                <x-stat-card label="Delay rate" :value="$show($stats['delay_rate'], '%')" accent="slate" />
+                <x-stat-card label="Exception rate" :value="$show($stats['exception_rate'], '%')" accent="slate" />
+                <x-stat-card label="On-time delivery rate" :value="$show($stats['on_time_rate'], '%')" accent="slate" />
+                <x-stat-card label="Average delay" :value="$show($stats['avg_delay'], ' h')" accent="slate" />
+                <x-stat-card label="Avg exception resolution" :value="$show($stats['avg_resolution'], ' h')" accent="slate" />
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="bg-white shadow-sm sm:rounded-lg p-6">
-                    <h3 class="font-semibold mb-3">Shipments by status</h3>
+                <div class="bg-white shadow-sm rounded-xl p-6">
+                    <h3 class="font-semibold text-gray-800 mb-3">Shipments by status</h3>
                     <div class="relative h-64"><canvas id="statusChart"></canvas></div>
                 </div>
 
-                <div class="bg-white shadow-sm sm:rounded-lg p-6">
-                    <h3 class="font-semibold mb-3">Shipments by carrier</h3>
+                <div class="bg-white shadow-sm rounded-xl p-6">
+                    <h3 class="font-semibold text-gray-800 mb-3">Shipments by carrier</h3>
                     <div class="relative h-64"><canvas id="carrierChart"></canvas></div>
                 </div>
             </div>
@@ -90,7 +67,7 @@
             type: 'bar',
             data: {
                 labels: @json($stats['status_labels']),
-                datasets: [{ label: 'Shipments', data: @json($stats['status_values']), backgroundColor: '#6366f1' }],
+                datasets: [{ label: 'Shipments', data: @json($stats['status_values']), backgroundColor: '#6366f1', borderRadius: 6 }],
             },
             options: chartOptions,
         });
@@ -99,7 +76,7 @@
             type: 'bar',
             data: {
                 labels: @json($stats['carrier_labels']),
-                datasets: [{ label: 'Shipments', data: @json($stats['carrier_values']), backgroundColor: '#0ea5e9' }],
+                datasets: [{ label: 'Shipments', data: @json($stats['carrier_values']), backgroundColor: '#0ea5e9', borderRadius: 6 }],
             },
             options: chartOptions,
         });

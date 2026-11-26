@@ -8,6 +8,7 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\ShipmentExceptionController;
 use App\Http\Controllers\TrackingEventController;
+use App\Http\Controllers\WeatherController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -24,6 +25,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::resource('shipments', ShipmentController::class);
+
+    Route::get('/shipments/{shipment}/weather', [WeatherController::class, 'show'])
+        ->name('shipments.weather');
 
     Route::post('/shipments/{shipment}/tracking', [TrackingEventController::class, 'store'])
         ->name('shipments.tracking.store');
