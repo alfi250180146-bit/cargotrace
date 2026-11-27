@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Tampilan datar: kartu putih memakai garis tipis, bukan bayangan */
+.bg-white.shadow-sm {
+    box-shadow: none;
+    border: 1px solid #d9e1ea;
+}
+
+[x-cloak] {
+    display: none !important;
+}

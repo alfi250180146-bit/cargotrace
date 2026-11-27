@@ -1,122 +1,62 @@
 @php
     $user = Auth::user();
 
-    $links = [
-        ['Dashboard', route('dashboard'), request()->routeIs('dashboard')],
-        ['Shipments', route('shipments.index'), request()->routeIs('shipments.*')],
+    $icons = [
+        'dashboard' => '<path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/>',
+        'shipments' => '<path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/>',
+        'carriers' => '<path d="M1 6h13v10H1z"/><path d="M14 9h4l3 3v4h-7z"/><circle cx="6" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>',
+        'locations' => '<path d="M12 21s7-6.2 7-11a7 7 0 10-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+        'settings' => '<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
     ];
 
-    $adminLinks = $user->hasRole('admin') ? [
-        ['Carriers', route('carriers.index'), request()->routeIs('carriers.*')],
-        ['Locations', route('locations.index'), request()->routeIs('locations.*')],
-        ['Delay settings', route('settings.edit'), request()->routeIs('settings.*')],
-    ] : [];
+    $sections = [
+        'Menu' => [
+            ['Dashboard', route('dashboard'), request()->routeIs('dashboard'), 'dashboard'],
+            ['Shipments', route('shipments.index'), request()->routeIs('shipments.*'), 'shipments'],
+        ],
+        'Administration' => $user->hasRole('admin') ? [
+            ['Carriers', route('carriers.index'), request()->routeIs('carriers.*'), 'carriers'],
+            ['Locations', route('locations.index'), request()->routeIs('locations.*'), 'locations'],
+            ['Delay settings', route('settings.edit'), request()->routeIs('settings.*'), 'settings'],
+        ] : [],
+    ];
 @endphp
 
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex">
-                <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}" class="flex items-center gap-2">
-                        <svg class="h-7 w-7 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 8l-9-5-9 5 9 5 9-5z" />
-                            <path d="M3 8v8l9 5 9-5V8" />
-                            <path d="M12 13v8" />
-                        </svg>
-                        <span class="text-lg font-semibold text-gray-900">CargoTrace</span>
+<div x-show="sidebar" x-cloak @click="sidebar = false" class="fixed inset-0 z-30 bg-black/50 lg:hidden"></div>
+
+<aside
+    class="fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-brand-900 text-white transition-transform duration-200 -translate-x-full lg:translate-x-0"
+    :class="{ 'translate-x-0': sidebar, '-translate-x-full': !sidebar }"
+>
+    <a href="{{ route('dashboard') }}" class="flex h-16 shrink-0 items-center gap-3 border-b border-brand-800 px-5">
+        <svg class="h-7 w-7 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 8l-9-5-9 5 9 5 9-5z" />
+            <path d="M3 8v8l9 5 9-5V8" />
+            <path d="M12 13v8" />
+        </svg>
+        <span>
+            <span class="block text-base font-semibold leading-tight">CargoTrace</span>
+            <span class="block text-xs text-brand-300 leading-tight">Shipment tracking</span>
+        </span>
+    </a>
+
+    <nav class="flex-1 overflow-y-auto py-4">
+        @foreach ($sections as $title => $items)
+            @if (count($items) > 0)
+                <div class="px-5 {{ $loop->first ? '' : 'mt-6' }} mb-2 text-xs font-semibold uppercase tracking-wider text-brand-300">{{ $title }}</div>
+
+                @foreach ($items as [$label, $url, $active, $icon])
+                    <a href="{{ $url }}"
+                       class="flex items-center gap-3 border-l-4 px-5 py-2.5 text-sm font-medium {{ $active ? 'border-white bg-brand-800 text-white' : 'border-transparent text-brand-100 hover:bg-brand-800 hover:text-white' }}">
+                        <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">{!! $icons[$icon] !!}</svg>
+                        {{ $label }}
                     </a>
-                </div>
+                @endforeach
+            @endif
+        @endforeach
+    </nav>
 
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    @foreach ($links as [$label, $url, $active])
-                        <x-nav-link :href="$url" :active="$active">{{ $label }}</x-nav-link>
-                    @endforeach
-
-                    @if (count($adminLinks) > 0)
-                        <div class="hidden sm:flex sm:items-center">
-                            <x-dropdown align="left" width="48">
-                                <x-slot name="trigger">
-                                    <button class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none">
-                                        Manage
-                                        <svg class="ms-1 h-4 w-4 fill-current" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                        </svg>
-                                    </button>
-                                </x-slot>
-
-                                <x-slot name="content">
-                                    @foreach ($adminLinks as [$label, $url])
-                                        <x-dropdown-link :href="$url">{{ $label }}</x-dropdown-link>
-                                    @endforeach
-                                </x-slot>
-                            </x-dropdown>
-                        </div>
-                    @endif
-                </div>
-            </div>
-
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 bg-white hover:text-gray-800 focus:outline-none transition">
-                            <div>{{ $user->name }}</div>
-                            <span class="ms-2 rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700">{{ $user->role }}</span>
-                            <svg class="ms-1 h-4 w-4 fill-current" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                    </x-slot>
-
-                    <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">{{ __('Profile') }}</x-dropdown-link>
-
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault(); this.closest('form').submit();">
-                                {{ __('Log Out') }}
-                            </x-dropdown-link>
-                        </form>
-                    </x-slot>
-                </x-dropdown>
-            </div>
-
-            <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none transition">
-                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-        </div>
+    <div class="shrink-0 border-t border-brand-800 px-5 py-4 text-xs text-brand-300">
+        Signed in as <span class="font-semibold text-white">{{ $user->role }}</span>
     </div>
-
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
-        <div class="pt-2 pb-3 space-y-1">
-            @foreach (array_merge($links, $adminLinks) as [$label, $url, $active])
-                <x-responsive-nav-link :href="$url" :active="$active">{{ $label }}</x-responsive-nav-link>
-            @endforeach
-        </div>
-
-        <div class="pt-4 pb-1 border-t border-gray-200">
-            <div class="px-4">
-                <div class="font-medium text-base text-gray-800">{{ $user->name }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ $user->email }} &middot; {{ $user->role }}</div>
-            </div>
-
-            <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')">{{ __('Profile') }}</x-responsive-nav-link>
-
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault(); this.closest('form').submit();">
-                        {{ __('Log Out') }}
-                    </x-responsive-nav-link>
-                </form>
-            </div>
-        </div>
-    </div>
-</nav>
+</aside>
