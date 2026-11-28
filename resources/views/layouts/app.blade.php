@@ -13,29 +13,25 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @stack('head')
     </head>
-    <body class="font-sans antialiased bg-gray-100 text-gray-800">
-        <div x-data="{ sidebar: false }" class="min-h-screen">
+    <body class="font-sans antialiased bg-stone-50 text-gray-800">
+        <div class="min-h-screen flex flex-col">
             @include('layouts.navigation')
 
-            <div class="lg:pl-64 flex flex-col min-h-screen">
-                @include('layouts.topbar')
+            @isset($header)
+                <header class="bg-white border-b border-stone-200">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+                        {{ $header }}
+                    </div>
+                </header>
+            @endisset
 
-                @isset($header)
-                    <header class="bg-white border-b border-gray-200">
-                        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
-                            {{ $header }}
-                        </div>
-                    </header>
-                @endisset
+            <main class="flex-1">
+                {{ $slot }}
+            </main>
 
-                <main class="flex-1">
-                    {{ $slot }}
-                </main>
-
-                <footer class="border-t border-gray-200 bg-white px-4 sm:px-6 lg:px-8 py-4 text-xs text-gray-500">
-                    CargoTrace &middot; Web Programming 2 final project
-                </footer>
-            </div>
+            <footer class="border-t border-stone-200 bg-white px-4 sm:px-6 lg:px-8 py-4 text-xs text-gray-500">
+                CargoTrace &middot; Web Programming 2 final project
+            </footer>
         </div>
 
         @stack('scripts')

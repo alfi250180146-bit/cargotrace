@@ -14,8 +14,7 @@
     </head>
     <body class="font-sans text-gray-800 antialiased">
         <div class="min-h-screen lg:grid lg:grid-cols-2">
-            <div class="hidden lg:flex flex-col justify-between bg-brand-900 p-12 text-white"
-                 style="background-image: linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px); background-size: 48px 48px;">
+            <div class="hidden lg:flex flex-col justify-between bg-brand-100 p-12 text-brand-900">
                 <a href="/" class="flex items-center gap-3">
                     <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 8l-9-5-9 5 9 5 9-5z" />
@@ -27,14 +26,14 @@
 
                 <div class="max-w-md">
                     <h2 class="text-3xl font-semibold leading-snug">Global shipment visibility and tracking</h2>
-                    <ul class="mt-6 space-y-3 text-brand-100">
-                        <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 bg-white"></span>Follow each shipment from origin to destination.</li>
-                        <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 bg-white"></span>Monitor delays and exceptions in one place.</li>
-                        <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 bg-white"></span>Access is limited by role, customers see only their own shipments.</li>
+                    <ul class="mt-6 space-y-3 text-brand-800">
+                        <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 bg-brand-600"></span>Follow each shipment from origin to destination.</li>
+                        <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 bg-brand-600"></span>Monitor delays and exceptions in one place.</li>
+                        <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 bg-brand-600"></span>Access is limited by role, customers see only their own shipments.</li>
                     </ul>
                 </div>
 
-                <div class="text-sm text-brand-300">Web Programming 2 final project</div>
+                <div class="text-sm text-brand-700">Web Programming 2 final project</div>
             </div>
 
             <div class="flex min-h-screen items-center justify-center bg-white px-6 py-12">

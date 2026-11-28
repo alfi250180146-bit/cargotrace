@@ -16,7 +16,7 @@
             </div>
 
             <a href="{{ route('shipments.index') }}"
-               class="inline-block px-4 py-2 bg-brand-700 text-white text-sm rounded-md hover:bg-brand-800">
+               class="inline-block px-4 py-2 bg-brand-600 text-white text-sm rounded-md hover:bg-brand-700">
                 View shipments
             </a>
         </div>
@@ -41,12 +41,12 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="bg-white border border-gray-200 rounded-md p-6">
+                <div class="bg-white border border-stone-200 rounded-md p-6">
                     <h3 class="font-semibold text-gray-900 mb-3">Shipments by status</h3>
                     <div class="relative h-64"><canvas id="statusChart"></canvas></div>
                 </div>
 
-                <div class="bg-white border border-gray-200 rounded-md p-6">
+                <div class="bg-white border border-stone-200 rounded-md p-6">
                     <h3 class="font-semibold text-gray-900 mb-3">Shipments by carrier</h3>
                     <div class="relative h-64"><canvas id="carrierChart"></canvas></div>
                 </div>
@@ -67,7 +67,7 @@
             type: 'bar',
             data: {
                 labels: @json($stats['status_labels']),
-                datasets: [{ label: 'Shipments', data: @json($stats['status_values']), backgroundColor: '#234470', borderRadius: 2 }],
+                datasets: [{ label: 'Shipments', data: @json($stats['status_values']), backgroundColor: '#6fb0a0', borderRadius: 3 }],
             },
             options: chartOptions,
         });
@@ -76,7 +76,7 @@
             type: 'bar',
             data: {
                 labels: @json($stats['carrier_labels']),
-                datasets: [{ label: 'Shipments', data: @json($stats['carrier_values']), backgroundColor: '#5d8bc0', borderRadius: 2 }],
+                datasets: [{ label: 'Shipments', data: @json($stats['carrier_values']), backgroundColor: '#e8b49f', borderRadius: 3 }],
             },
             options: chartOptions,
         });

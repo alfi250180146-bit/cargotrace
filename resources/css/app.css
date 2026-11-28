@@ -5,7 +5,7 @@
 /* Tampilan datar: kartu putih memakai garis tipis, bukan bayangan */
 .bg-white.shadow-sm {
     box-shadow: none;
-    border: 1px solid #d9e1ea;
+    border: 1px solid #e7e5e4;
 }
 
 [x-cloak] {

@@ -1,20 +1,20 @@
 import defaultTheme from 'tailwindcss/defaultTheme';
 import forms from '@tailwindcss/forms';
 
-// Biru navy resmi. Nama "indigo" dialihkan ke palet yang sama,
+// Palet pastel mint-sage. Nama "indigo" dialihkan ke palet yang sama,
 // jadi semua view lama otomatis ikut berubah warna.
 const brand = {
-    50: '#f1f5fa',
-    100: '#dde7f3',
-    200: '#bccfe7',
-    300: '#8fb0d6',
-    400: '#5d8bc0',
-    500: '#3a6ba5',
-    600: '#2b5486',
-    700: '#234470',
-    800: '#1d3858',
-    900: '#172c46',
-    950: '#0f1d30',
+    50: '#f1f8f6',
+    100: '#ddeee9',
+    200: '#bfe0d7',
+    300: '#9accbf',
+    400: '#6fb0a0',
+    500: '#4f9484',
+    600: '#3d776b',
+    700: '#335f56',
+    800: '#2c4d46',
+    900: '#26403b',
+    950: '#14231f',
 };
 
 /** @type {import('tailwindcss').Config} */
@@ -32,9 +32,9 @@ export default {
                 indigo: brand,
             },
             borderRadius: {
-                md: '0.25rem',
-                lg: '0.25rem',
-                xl: '0.375rem',
+                md: '0.375rem',
+                lg: '0.5rem',
+                xl: '0.5rem',
             },
             fontFamily: {
                 sans: ['"IBM Plex Sans"', ...defaultTheme.fontFamily.sans],

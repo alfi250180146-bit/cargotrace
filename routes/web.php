@@ -1,13 +1,16 @@
 <?php
 
+use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\CarrierController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\ShipmentExceptionController;
 use App\Http\Controllers\TrackingEventController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\WeatherController;
 use Illuminate\Support\Facades\Route;
 
@@ -37,10 +40,17 @@ Route::middleware('auth')->group(function () {
     Route::patch('/exceptions/{shipmentException}', [ShipmentExceptionController::class, 'update'])
         ->name('exceptions.update');
 
-    // Khusus Admin: master data dan pengaturan threshold
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
+    Route::get('/notifications/{id}', [NotificationController::class, 'show'])->name('notifications.show');
+
+    // Khusus Admin
     Route::middleware('role:admin')->group(function () {
+        Route::resource('users', UserController::class)->except('show');
         Route::resource('carriers', CarrierController::class)->except('show');
         Route::resource('locations', LocationController::class)->except('show');
+
+        Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
 
         Route::get('/settings', [SettingController::class, 'edit'])->name('settings.edit');
         Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
